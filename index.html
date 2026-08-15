@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>魔法粒子 Magic Particle · 图片转粒子</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;700;900&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 顶部导航：终端风格 -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="brand">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="path">~/</span><span class="path-name">魔法粒子 Magic Particle</span><span class="cursor-blink" aria-hidden="true"></span>
+      </div>
+      <ol class="stepper" aria-label="进度">
+        <li class="step is-active" data-step="import"><span class="step-cmd">$ 定义</span></li>
+        <li class="step" data-step="config"><span class="step-cmd">$ 精度</span></li>
+        <li class="step" data-step="preview"><span class="step-cmd">$ 预览</span></li>
+      </ol>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题" title="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <main class="app">
+    <!-- 步骤 1：导入 -->
+    <section class="panel is-active" id="panel-import" aria-labelledby="import-title">
+      <div class="terminal-window import-window">
+        <div class="window-header">
+          <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+          <span class="window-title">import.sh — 魔法粒子 Magic Particle</span>
+          <span class="window-status">idle</span>
+        </div>
+        <div class="window-content import-body">
+          <h1 id="import-title" class="sr-only">导入素材</h1>
+          <div class="mode-tabs" role="tablist" aria-label="生成方式">
+            <button class="mode-tab is-active" data-mode="image" role="tab" aria-selected="true">图片</button>
+            <button class="mode-tab" data-mode="text" role="tab" aria-selected="false">文字</button>
+            <button class="mode-tab" data-mode="wordcloud" role="tab" aria-selected="false">词云</button>
+          </div>
+
+          <!-- 图片模式 -->
+          <div class="mode-pane is-active" data-pane="image">
+            <div class="comment-block">
+              <span class="comment">// 把图片拆成会发光的彩色粒子</span>
+              <span class="comment">// 支持 png / jpg / webp / gif / bmp / svg</span>
+            </div>
+            <label class="dropzone" id="dropzone" for="fileInput" tabindex="0" role="button" aria-label="点击或拖拽图片到此处导入">
+              <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,image/svg+xml" hidden />
+              <div class="dz-prompt"><span class="cmd-prefix">$</span> 导入图片 <span class="dz-or">--拖入或点击选择</span></div>
+              <div class="dz-inner">
+                <div class="dz-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 16V4m0 0L7 9m5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 17v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <p class="dz-hint">也可以直接把文件拖到页面任意位置</p>
+              </div>
+            </label>
+            <p class="err" id="importErr" role="alert" hidden></p>
+          </div>
+
+          <!-- 文字模式 -->
+          <div class="mode-pane" data-pane="text" hidden>
+            <div class="comment-block">
+              <span class="comment">// 不想上传？直接用文字生成粒子</span>
+            </div>
+            <textarea id="textInput" class="text-input" rows="3" placeholder="输入文字，例如：你好世界"></textarea>
+            <div class="examples">
+              <span class="examples-label">例子：</span>
+              <button class="chip" type="button" data-fill="你好\n世界">你好世界</button>
+              <button class="chip" type="button" data-fill="PARTICLE\nFORGE">PARTICLE</button>
+              <button class="chip" type="button" data-fill="前端\n粒子\n艺术">前端粒子</button>
+            </div>
+            <button class="btn btn-primary" id="textGenBtn" type="button"><span class="cmd-prefix">$</span> 用文字生成</button>
+          </div>
+
+          <!-- 词云模式 -->
+          <div class="mode-pane" data-pane="wordcloud" hidden>
+            <div class="comment-block">
+              <span class="comment">// 词云：多个词，用空格 / 逗号 / 换行分隔</span>
+            </div>
+            <textarea id="wcInput" class="text-input" rows="3" placeholder="前端 粒子 创意 设计 AI 代码 艺术"></textarea>
+            <div class="palette-row">
+              <label class="field">配色
+                <select id="wcPalette" class="select">
+                  <option value="rainbow">随机彩虹</option>
+                  <option value="neon">霓虹</option>
+                  <option value="morandi">莫兰迪</option>
+                  <option value="warm">暖色</option>
+                  <option value="cool">冷色</option>
+                  <option value="custom">自定义</option>
+                </select>
+              </label>
+            </div>
+            <div class="palette-custom" id="wcCustom" hidden>
+              <span class="examples-label">自定义颜色：</span>
+              <span class="color-list">
+                <input type="color" class="color-input" value="#cc7a60" data-i="0" />
+                <input type="color" class="color-input" value="#4cc9b0" data-i="1" />
+                <input type="color" class="color-input" value="#f2c14e" data-i="2" />
+                <input type="color" class="color-input" value="#7c9cf2" data-i="3" />
+                <input type="color" class="color-input" value="#e06c9f" data-i="4" />
+              </span>
+            </div>
+            <div class="examples">
+              <span class="examples-label">例子：</span>
+              <button class="chip" type="button" data-wcfill="前端 粒子 创意 设计 AI 代码 艺术 视觉 交互 灵感">科技词云</button>
+              <button class="chip" type="button" data-wcfill="梦想 勇气 自由 热爱 星辰 大海 远方">文艺词云</button>
+            </div>
+            <button class="btn btn-primary" id="wcGenBtn" type="button"><span class="cmd-prefix">$</span> 用词云生成</button>
+          </div>
+
+          <!-- 字体选择（文字/词云共用） -->
+          <div class="font-row" id="fontRow" hidden>
+            <label class="field">字体
+              <select id="fontSelect" class="select">
+                <option value='"Microsoft YaHei", "PingFang SC", sans-serif'>黑体 / 无衬线</option>
+                <option value='"Noto Sans SC", "Microsoft YaHei", sans-serif'>思源黑体</option>
+                <option value='"Noto Serif SC", "SimSun", serif'>思源宋体 / 宋</option>
+                <option value='"KaiTi", "STKaiti", serif'>楷体</option>
+                <option value='"DengXian", "Microsoft YaHei", sans-serif'>等线</option>
+                <option value='"JetBrains Mono", "Consolas", monospace'>等宽 Mono</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- 厚度（3D 立体，文字 / 词云共用） -->
+          <div class="extrude-row" id="extrudeRow" hidden>
+            <label class="ctrl-slider">
+              <span class="ctrl-label">厚度（3D 立体）<em id="thicknessVal">6</em></span>
+              <input type="range" id="thicknessRange" min="0" max="16" step="1" value="6" />
+            </label>
+            <span class="extrude-hint">0 = 平面文字；数值越大，文字 / 词云越厚，旋转时立体感越强（粒子数随之增加）</span>
+          </div>
+
+          <p class="err" id="textErr" role="alert" hidden></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 步骤 2：精度选择 -->
+    <section class="panel" id="panel-config" aria-labelledby="config-title" hidden>
+      <div class="terminal-window config-window">
+        <div class="window-header">
+          <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+          <span class="window-title">forge.config — 魔法粒子 Magic Particle</span>
+          <span class="window-status" id="configStatus">select</span>
+        </div>
+        <div class="window-content config-body">
+          <h2 id="config-title" class="sr-only">选择粒子精度</h2>
+          <div class="comment-block">
+            <span class="comment">// precision = 压缩后的分辨率，即最终粒子数量</span>
+          </div>
+
+          <div class="preview-thumb">
+            <img id="thumbImg" alt="已导入素材预览" />
+            <div class="thumb-meta">
+              <span id="thumbName" class="meta-name">image</span>
+              <span id="thumbDim" class="meta-dim"></span>
+            </div>
+            <button class="btn btn-ghost back-inline" id="backToImport" type="button">← 返回</button>
+          </div>
+
+          <div class="depth-opt-wrap" id="depthOptWrap" hidden>
+            <label class="depth-opt">
+              <input type="checkbox" id="useDepthMap" />
+              <span>使用深度图（可由 Depth-Anything / MiDaS 等单目深度模型生成，越亮越靠前）</span>
+            </label>
+            <div class="depth-input-row" id="depthInputRow" hidden>
+              <input type="file" id="depthFileInput" accept="image/*" />
+              <span class="depth-hint">灰度图：越亮 = 越靠前</span>
+            </div>
+            <div class="ai-prompt" id="aiPromptBox" hidden>
+              <span class="comment">// AI 绘图提示词：复制到 Midjourney / Stable Diffusion 生成带景深的图像</span>
+              <textarea id="aiPromptText" class="ai-prompt-text" rows="3" spellcheck="false">A detailed scene with strong depth, clear foreground subject and distant background, soft volumetric lighting, cinematic composition, high detail, photorealistic --ar 3:2</textarea>
+              <div class="ai-prompt-actions">
+                <button type="button" class="btn btn-ghost" id="aiPromptCopy">复制提示词</button>
+                <button type="button" class="btn btn-ghost" id="aiPromptRandom">随机示例</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="precision-grid" role="radiogroup" aria-label="粒子精度">
+            <button class="prec-card" role="radio" aria-checked="false" data-key="low" data-target="64">
+              <span class="prec-head"><span class="prec-tag">低</span><span class="prec-count" id="countLow">—</span></span>
+              <span class="prec-note">轻量流畅 · 快速预览</span>
+            </button>
+            <button class="prec-card is-recommended" role="radio" aria-checked="false" data-key="medium" data-target="120">
+              <span class="prec-badge">推荐</span>
+              <span class="prec-head"><span class="prec-tag">中</span><span class="prec-count" id="countMed">—</span></span>
+              <span class="prec-note">清晰与性能的平衡点</span>
+            </button>
+            <button class="prec-card" role="radio" aria-checked="false" data-key="high" data-target="180">
+              <span class="prec-head"><span class="prec-tag">高</span><span class="prec-count" id="countHigh">—</span></span>
+              <span class="prec-note">细腻 · 粒子数较多</span>
+            </button>
+            <button class="prec-card" role="radio" aria-checked="false" data-key="ultra" data-target="280">
+              <span class="prec-head"><span class="prec-tag">超高档</span><span class="prec-count" id="countUltra">—</span></span>
+              <span class="prec-note">细腻 · 适合大图</span>
+            </button>
+            <button class="prec-card" role="radio" aria-checked="false" data-key="extreme" data-target="420">
+              <span class="prec-head"><span class="prec-tag">极限档</span><span class="prec-count" id="countExtreme">—</span></span>
+              <span class="prec-note">极致密度 · 性能吃紧</span>
+            </button>
+            <button class="prec-card" role="radio" aria-checked="false" data-key="custom">
+              <span class="prec-head"><span class="prec-tag">自定义</span></span>
+              <span class="prec-note">最长边粒子数自定</span>
+            </button>
+          </div>
+          <div class="custom-prec-row" id="customPrecRow" hidden>
+            <label class="field">自定义精度（最长边粒子数）
+              <input type="number" id="customPrec" class="select" min="32" max="800" step="4" value="300" />
+            </label>
+            <span class="prec-note" id="customCount"></span>
+          </div>
+
+          <div class="config-actions">
+            <button class="btn btn-primary" id="startBtn" type="button" disabled><span class="cmd-prefix">$</span> 开始生成</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 步骤 3：生成 + 预览 -->
+    <section class="panel stage-panel" id="panel-preview" aria-labelledby="preview-title" hidden>
+      <div class="terminal-window preview-window">
+        <div class="window-header">
+          <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+          <span class="window-title">render.ts — 魔法粒子 Magic Particle</span>
+          <span class="window-status" id="statLine">粒子数：0</span>
+        </div>
+        <div class="window-content preview-body">
+          <div class="stage-wrap">
+            <canvas id="stage" aria-label="粒子预览画布"></canvas>
+            <div class="gen-overlay" id="genOverlay">
+              <div class="gen-ring" aria-hidden="true"></div>
+              <p class="gen-text">正在逐格锻造粒子…</p>
+              <div class="gen-bar"><i id="genBar"></i></div>
+            </div>
+            <p class="stage-hint" id="stageHint">拖动旋转 · 滚轮缩放</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="terminal-window controls" aria-label="视图控制">
+        <div class="window-header">
+          <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+          <span class="window-title">controls.sh</span>
+        </div>
+        <div class="window-content controls-body">
+          <h2 id="preview-title" class="sr-only">粒子预览</h2>
+
+          <div class="ctrl-row">
+            <button class="btn btn-toggle is-on" id="autoRotate" type="button" aria-pressed="true">自动旋转</button>
+            <button class="btn btn-ghost" id="resetView" type="button">重置</button>
+          </div>
+
+          <label class="ctrl-slider">
+            <span class="ctrl-label">旋转速度 <em id="rotSpeedVal">0.4</em></span>
+            <input type="range" id="rotSpeedRange" min="0" max="2" step="0.05" value="0.4" />
+          </label>
+
+          <!-- 鼠标排斥 精细面板 -->
+          <div class="subcard" id="repelCard">
+            <div class="subcard-head">
+              <span class="subcard-title">鼠标排斥</span>
+              <button class="btn btn-toggle is-on btn-sm" id="repelToggle" type="button" aria-pressed="true">开</button>
+            </div>
+            <div class="subcard-body">
+              <label class="ctrl-slider">
+                <span class="ctrl-label">受力范围 <em id="repelRadiusVal">110</em></span>
+                <input type="range" id="repelRadius" min="40" max="300" step="5" value="110" />
+              </label>
+              <label class="ctrl-slider">
+                <span class="ctrl-label">力度 <em id="repelStrengthVal">46</em></span>
+                <input type="range" id="repelStrength" min="10" max="140" step="2" value="46" />
+              </label>
+              <label class="ctrl-slider">
+                <span class="ctrl-label">靠近放大 <em id="repelGrowVal">0.7</em></span>
+                <input type="range" id="repelGrow" min="0" max="2" step="0.1" value="0.7" />
+              </label>
+            </div>
+          </div>
+
+          <div class="ctrl-row">
+            <button class="btn btn-toggle" id="spatialToggle" type="button" aria-pressed="false">3D 照片</button>
+            <button class="btn btn-ghost" id="resetTilt" type="button">回正</button>
+          </div>
+
+          <label class="ctrl-slider">
+            <span class="ctrl-label">3D 照片拉回速度 <em id="pullbackVal">0.08</em></span>
+            <input type="range" id="pullbackRange" min="0.02" max="0.5" step="0.02" value="0.08" />
+          </label>
+
+          <label class="ctrl-slider">
+            <span class="ctrl-label">粒子大小 <em id="sizeVal">2.4</em></span>
+            <input type="range" id="sizeRange" min="1" max="6" step="0.2" value="2.4" />
+          </label>
+          <label class="ctrl-slider">
+            <span class="ctrl-label">缩放 <em id="zoomVal">1.0×</em></span>
+            <input type="range" id="zoomRange" min="0.3" max="4" step="0.05" value="1" />
+          </label>
+          <label class="ctrl-slider">
+            <span class="ctrl-label">立体景深 <em id="depthVal">0.6</em></span>
+            <input type="range" id="depthRange" min="0" max="1.4" step="0.05" value="0.6" />
+          </label>
+
+          <div class="ctrl-row">
+            <button class="btn btn-ghost" id="exportBtn" type="button">导出.png</button>
+            <button class="btn btn-ghost" id="reImportBtn" type="button">重新导入</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- 全窗口拖拽上传遮罩 -->
+  <div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+    <div class="drop-overlay-box">
+      <div class="drop-overlay-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 16V4m0 0L7 9m5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 17v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="drop-overlay-text">释放以导入图片</p>
+      <p class="drop-overlay-sub">支持 png / jpg / webp / gif / bmp / svg</p>
+    </div>
+  </div>
+
+  <!-- 关于：底部单行，可展开 -->
+  <footer class="about-footer">
+    <button class="about-line" id="aboutLine" type="button" aria-expanded="false" aria-controls="aboutExpand">
+      <span class="cmd-prefix">$</span> 关于 魔法粒子 Magic Particle <span class="about-caret" aria-hidden="true">▾</span>
+    </button>
+    <div class="about-expand" id="aboutExpand" hidden>
+      <div class="terminal-window about-window">
+        <div class="window-header">
+          <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+          <span class="window-title">about.md — 魔法粒子 Magic Particle</span>
+        </div>
+        <div class="window-content about-body">
+          <h2 id="aboutTitle" class="about-h">~/about — 关于本站点</h2>
+          <p class="about-lead">一个纯前端的「图片 / 文字 / 词云 → 3D 粒子」交互工具。所有图片与文字处理都在你的浏览器本地完成，不会上传到任何服务器。</p>
+
+          <div class="about-section">
+            <span class="comment">// 我的主页（内已跳转至本项目）</span>
+            <a class="about-link" href="https://asiawest.pages.dev/" target="_blank" rel="noopener noreferrer">asiawest.pages.dev ↗</a>
+          </div>
+
+          <div class="about-section">
+            <span class="comment">// GitHub 介绍</span>
+            <div class="gh-card">
+              <img class="gh-avatar" src="https://github.com/Artruok.png?size=96" alt="Ember_Asiawset 的 GitHub 头像" referrerpolicy="no-referrer" />
+              <div class="gh-info">
+                <p class="gh-name">Ember_Asiawset</p>
+                <p class="gh-bio">我是一名新人开发者。</p>
+                <p class="gh-bio">详细信息在 <a class="about-link" href="https://asiawest.pages.dev/" target="_blank" rel="noopener noreferrer">我的主页</a>。</p>
+                <a class="about-link" id="ghLink" href="https://github.com/Artruok" target="_blank" rel="noopener noreferrer">github.com/Artruok ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+  (function () {
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const sun = document.querySelector('.icon-sun');
+    const moon = document.querySelector('.icon-moon');
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+        sun.style.display = 'none'; moon.style.display = 'block';
+      } else {
+        html.setAttribute('data-theme', 'light');
+        sun.style.display = 'block'; moon.style.display = 'none';
+      }
+      try { localStorage.setItem('pf-theme', theme); } catch (e) {}
+    }
+    const saved = (function () { try { return localStorage.getItem('pf-theme'); } catch (e) { return null; } })();
+    setTheme(saved || 'dark');
+    toggle.addEventListener('click', function () {
+      setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  })();
+  </script>
+
+  <script>
+  (function () {
+    const line = document.getElementById('aboutLine');
+    const expand = document.getElementById('aboutExpand');
+    if (!line || !expand) return;
+    function toggle() {
+      const open = expand.hidden;
+      expand.hidden = !open;
+      line.setAttribute('aria-expanded', String(open));
+      line.querySelector('.about-caret').textContent = open ? '▴' : '▾';
+      if (open) line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    line.addEventListener('click', toggle);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !expand.hidden) { expand.hidden = true; line.setAttribute('aria-expanded', 'false'); line.querySelector('.about-caret').textContent = '▾'; line.focus(); }
+    });
+  })();
+  </script>
+</body>
+</html>
