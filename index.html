@@ -22,6 +22,7 @@
         <li class="step" data-step="config"><span class="step-cmd">$ 精度</span></li>
         <li class="step" data-step="preview"><span class="step-cmd">$ 预览</span></li>
       </ol>
+      <a class="about-btn" id="aboutBtn" href="about.html" aria-label="关于本站点" title="关于">关于</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题" title="切换主题">
         <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke-linecap="round"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -80,7 +81,6 @@
               <button class="chip" type="button" data-fill="PARTICLE\nFORGE">PARTICLE</button>
               <button class="chip" type="button" data-fill="前端\n粒子\n艺术">前端粒子</button>
             </div>
-            <button class="btn btn-primary" id="textGenBtn" type="button"><span class="cmd-prefix">$</span> 用文字生成</button>
           </div>
 
           <!-- 词云模式 -->
@@ -116,7 +116,6 @@
               <button class="chip" type="button" data-wcfill="前端 粒子 创意 设计 AI 代码 艺术 视觉 交互 灵感">科技词云</button>
               <button class="chip" type="button" data-wcfill="梦想 勇气 自由 热爱 星辰 大海 远方">文艺词云</button>
             </div>
-            <button class="btn btn-primary" id="wcGenBtn" type="button"><span class="cmd-prefix">$</span> 用词云生成</button>
           </div>
 
           <!-- 字体选择（文字/词云共用） -->
@@ -143,6 +142,11 @@
           </div>
 
           <p class="err" id="textErr" role="alert" hidden></p>
+
+          <div class="gen-actions" id="genActions" hidden>
+            <button class="btn btn-primary" id="textGenBtn" type="button"><span class="cmd-prefix">$</span> 用文字生成</button>
+            <button class="btn btn-primary" id="wcGenBtn" type="button"><span class="cmd-prefix">$</span> 用词云生成</button>
+          </div>
         </div>
       </div>
     </section>
@@ -337,43 +341,6 @@
     </div>
   </div>
 
-  <!-- 关于：底部单行，可展开 -->
-  <footer class="about-footer">
-    <button class="about-line" id="aboutLine" type="button" aria-expanded="false" aria-controls="aboutExpand">
-      <span class="cmd-prefix">$</span> 关于 魔法粒子 Magic Particle <span class="about-caret" aria-hidden="true">▾</span>
-    </button>
-    <div class="about-expand" id="aboutExpand" hidden>
-      <div class="terminal-window about-window">
-        <div class="window-header">
-          <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
-          <span class="window-title">about.md — 魔法粒子 Magic Particle</span>
-        </div>
-        <div class="window-content about-body">
-          <h2 id="aboutTitle" class="about-h">~/about — 关于本站点</h2>
-          <p class="about-lead">一个纯前端的「图片 / 文字 / 词云 → 3D 粒子」交互工具。所有图片与文字处理都在你的浏览器本地完成，不会上传到任何服务器。</p>
-
-          <div class="about-section">
-            <span class="comment">// 我的主页（内已跳转至本项目）</span>
-            <a class="about-link" href="https://asiawest.pages.dev/" target="_blank" rel="noopener noreferrer">asiawest.pages.dev ↗</a>
-          </div>
-
-          <div class="about-section">
-            <span class="comment">// GitHub 介绍</span>
-            <div class="gh-card">
-              <img class="gh-avatar" src="https://github.com/Artruok.png?size=96" alt="Ember_Asiawset 的 GitHub 头像" referrerpolicy="no-referrer" />
-              <div class="gh-info">
-                <p class="gh-name">Ember_Asiawset</p>
-                <p class="gh-bio">我是一名新人开发者。</p>
-                <p class="gh-bio">详细信息在 <a class="about-link" href="https://asiawest.pages.dev/" target="_blank" rel="noopener noreferrer">我的主页</a>。</p>
-                <a class="about-link" id="ghLink" href="https://github.com/Artruok" target="_blank" rel="noopener noreferrer">github.com/Artruok ↗</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
   <script src="app.js"></script>
   <script>
   (function () {
@@ -399,23 +366,5 @@
   })();
   </script>
 
-  <script>
-  (function () {
-    const line = document.getElementById('aboutLine');
-    const expand = document.getElementById('aboutExpand');
-    if (!line || !expand) return;
-    function toggle() {
-      const open = expand.hidden;
-      expand.hidden = !open;
-      line.setAttribute('aria-expanded', String(open));
-      line.querySelector('.about-caret').textContent = open ? '▴' : '▾';
-      if (open) line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    line.addEventListener('click', toggle);
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !expand.hidden) { expand.hidden = true; line.setAttribute('aria-expanded', 'false'); line.querySelector('.about-caret').textContent = '▾'; line.focus(); }
-    });
-  })();
-  </script>
 </body>
 </html>

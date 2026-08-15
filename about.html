@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>关于 · 魔法粒子 Magic Particle</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="brand">
+      <span class="path">~/</span><span class="path-name">魔法粒子 Magic Particle</span>
+    </div>
+    <a class="about-btn" href="index.html" title="返回首页">← 返回</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题" title="切换主题">
+      <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke-linecap="round"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+    </button>
+  </nav>
+
+  <main class="about-page">
+    <div class="terminal-window about-window">
+      <div class="window-header">
+        <div class="window-dots" aria-hidden="true"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <span class="window-title">about.md — 魔法粒子 Magic Particle</span>
+      </div>
+      <div class="window-content about-body">
+        <h2 class="about-h">~/about — 关于本站点</h2>
+        <p class="about-lead">一个纯前端的「图片 / 文字 / 词云 → 3D 粒子」交互工具。所有图片与文字处理都在你的浏览器本地完成，不会上传到任何服务器。</p>
+
+        <div class="about-section">
+          <span class="comment">// 我的主页（内已跳转至本项目）</span>
+          <a class="about-link" href="https://asiawest.pages.dev/" target="_blank" rel="noopener noreferrer">asiawest.pages.dev ↗</a>
+        </div>
+
+        <div class="about-section">
+          <span class="comment">// GitHub 介绍</span>
+          <div class="gh-card">
+            <img class="gh-avatar" src="https://github.com/Artruok.png?size=96" alt="Ember_Asiawset 的 GitHub 头像" referrerpolicy="no-referrer" />
+            <div class="gh-info">
+              <p class="gh-name">Ember_Asiawset</p>
+              <p class="gh-bio">我是一名新人开发者。</p>
+              <p class="gh-bio">详细信息在 <a class="about-link" href="https://asiawest.pages.dev/" target="_blank" rel="noopener noreferrer">我的主页</a>。</p>
+              <a class="about-link" href="https://github.com/Artruok" target="_blank" rel="noopener noreferrer">github.com/Artruok ↗</a>
+              <a class="about-link" href="https://github.com/Artruok/-MagicParticle" target="_blank" rel="noopener noreferrer">开源仓库 / -MagicParticle ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+  (function () {
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const sun = document.querySelector('.icon-sun');
+    const moon = document.querySelector('.icon-moon');
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      sun.style.display = theme === 'dark' ? 'none' : 'block';
+      moon.style.display = theme === 'dark' ? 'block' : 'none';
+      try { localStorage.setItem('pf-theme', theme); } catch (e) {}
+    }
+    const saved = (function () { try { return localStorage.getItem('pf-theme'); } catch (e) { return null; } })();
+    setTheme(saved || 'dark');
+    toggle.addEventListener('click', function () {
+      setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  })();
+  </script>
+</body>
+</html>

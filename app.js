@@ -104,6 +104,7 @@
   const modeTabs = document.querySelectorAll('.mode-tab');
   const modePanes = document.querySelectorAll('.mode-pane');
   const fontRow = $('fontRow');
+  const extrudeRow = $('extrudeRow');
   function setMode(mode) {
     state.mode = mode;
     modeTabs.forEach((t) => {
@@ -117,6 +118,10 @@
     });
     fontRow.hidden = !(mode === 'text' || mode === 'wordcloud');
     extrudeRow.hidden = !(mode === 'text' || mode === 'wordcloud');
+    const genActions = $('genActions');
+    genActions.hidden = !(mode === 'text' || mode === 'wordcloud');
+    $('textGenBtn').hidden = mode !== 'text';
+    $('wcGenBtn').hidden = mode !== 'wordcloud';
   }
   modeTabs.forEach((t) => t.addEventListener('click', () => setMode(t.dataset.mode)));
 
