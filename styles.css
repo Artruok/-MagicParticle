@@ -498,7 +498,9 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 760px) {
   .stepper { display: none; }
   #panel-preview.is-active { flex-direction: column; }
-  .controls { width: 100%; }
+  /* 移动端：预览区给固定可视高度，避免被控制面板压成 0 高度而「看不见粒子」 */
+  .preview-window { flex: 0 0 44dvh; width: 100%; min-height: 0; }
+  .controls { width: 100%; flex: 1 1 auto; min-height: 0; }
   .ctrl-row { flex: 1 1 100%; }
   .ctrl-slider { flex: 1 1 45%; }
 }
